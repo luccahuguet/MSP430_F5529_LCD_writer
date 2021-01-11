@@ -12,9 +12,9 @@ int main(void)
 
     // Initializes input pins
 
-    P1DIR &= ~BIT1; // P1.1 is input -> left button
-    P1REN |= BIT1;  // Resistor pull up / pull down is enabled
-    P1OUT |= BIT1;  // Resistor is a pull up resistor
+    P1DIR &= ~BIT1; // P1.1 is input -> left button.
+    P1REN |= BIT1;  // Resistor pull up / pull down is enabled.
+    P1OUT |= BIT1;  // Resistor is a pull up resistor.
 
     // Initializes output pins.
 
