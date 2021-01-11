@@ -25,7 +25,7 @@ int main(void)
     {
         if (P1IN & BIT1)
         {
-            P1OUT &= ~BIT0; // Turns off the led if the button is not currently pressed;
+            P1OUT &= ~BIT0; //
         }
         else
         {
