@@ -16,7 +16,7 @@ int main(void)
     P1REN |= BIT1;  // Resistor pull up / pull down is enabled
     P1OUT |= BIT1;  // Resistor is a pull up resistor
 
-    // Initializes output pins
+    // Initializes output pins.
 
     P1DIR |= BIT0;  // P1.0 is output -> red led
     P1OUT &= ~BIT0; // initialized on off
