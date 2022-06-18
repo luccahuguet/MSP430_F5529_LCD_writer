@@ -1,0 +1,1 @@
+"./PF-160013259.obj" "./libraries/i2c.obj" "./libraries/lcd.obj" "./libraries/mpu6050.obj" "../lnk_msp430f5529.cmd" -llibmath.a -llibc.a 

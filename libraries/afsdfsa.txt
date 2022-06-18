@@ -1,0 +1,76 @@
+" The UCBxTXIFG bit is set when
+the START condition is generated and the first data to be transmitted can be
+written into UCBxTXBUF. As soon as the slave acknowledges the address the
+UCTXSTT bit is cleared.
+
+// codigo do gyro antigo
+
+void C_Dgyro_I2C_write(char reg_addr, char parameters)
+{
+    __disable_interrupt();
+      while(UCB0STAT & UCBUSY);
+      UCB0CTL1 |= UCTXSTT + UCTR;          //Start Condition sends address of slave
+
+       while (!(IFG2 & UCB0TXIFG));
+      UCB0TXBUF = reg_addr;                //Load address of slave register
+
+      while (!(IFG2 & UCB0TXIFG));
+      UCB0TXBUF = parameters;            //Load address of slave register
+      while (!(IFG2 & UCB0TXIFG));
+
+      UCB0CTL1 |= UCTXSTP;              //Send stop message
+      while (UCB0CTL1 & UCTXSTP);         //Wait until the stop message is sent
+
+     __enable_interrupt();
+}
+
+signed int C_Dgyro_I2C_read(char reg_addr)
+{
+      signed int gyroData = 0;
+
+      __disable_interrupt();
+
+      while(UCB0STAT & UCBUSY);
+      UCB0CTL1 |= UCTXSTT + UCTR;          //Start Condition sends address of slave
+
+      while (!(IFG2 & UCB0TXIFG));       //Wait until the data has been shifted out
+      UCB0TXBUF = reg_addr;                //Load address of slave register
+
+      while (UCB0CTL1 & UCTXSTT);        //Wait until the acknowlege message has been received
+      while(UCB0STAT & UCBUSY);
+      UCB0CTL1 &= ~UCTR;                //Sets the master as a receiver
+      UCB0CTL1 |= UCTXSTT;                 //Start Condition sends address of slave
+
+      while(UCB0CTL1 & UCTXSTT);
+
+      UCB0CTL1 |= UCTXSTP;              //Send stop message
+
+      while (!(IFG2 & UCB0RXIFG));
+      gyroData = UCB0RXBUF;                //Save data to memory
+
+       while((UCB0CTL1 & UCTXSTP));
+
+       __enable_interrupt();
+      return gyroData;
+}
+
+
+  while(!(UCB1IFG & UCTXIFG)) { //Wait until UCTXIFG==1 is set to denote empty buffer.
+
+
+OBS como settar o clk do i2c
+  UCB0CTL1 = UCSSEL_2+UCSWRST; // Use SMCLK, keep SW reset
+UCB0BR0 = 12; // fSCL = SMCLK/12 = ~100kHz
+UCB0BR1 = 0;
+
+And you must wait for the received byte to be available (UCRXIFG) before trying to read it.
+
+
+The internal registers and memory of the MPU-6000/MPU-6050 can be accessed using either I2C at 400 kHz
+or SPI at 1MHz (MPU-6000 only).
+
+    // normal                 2000   0 16000
+    // inclinado pra frente   2000   -8000 14000 (total -16000)
+    // inclinado pra trás     2000   8000  14000 (total 16000)
+    // inclinado pra direita  -6000  0     14700 (total -16000)
+    // inclinado pra esquerda 100000 400   112780 (total 17000)
